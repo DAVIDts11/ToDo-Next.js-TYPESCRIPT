@@ -1,54 +1,40 @@
-// import Head from 'next/head'
-// import Image from 'next/image'
-// import { Inter } from '@next/font/google'
-// import styles from '../styles/Home.module.css'
-import { Todo } from "../utils/types"
-import Link from "next/link"
 
-// Define the components props
-interface IndexProps {
-  todos: Array<Todo>
-}
+import { useRouter } from "next/router"
+import { FormEvent, FormEventHandler, useRef } from "react"
 
 // define the page component
-function Index(props: IndexProps) {
-  const { todos } = props
-  const uncompitedToDos: String = todos.filter(todo => (todo.completed === false)).length.toString()
+function Index() {
+    // get the next route
+    const router = useRouter()
 
-  //Array.isArray(todos) && 
-  return (
-    <div>
-      <h1>Hello David </h1>
-      <h2> You have {uncompitedToDos} uncomplited todos</h2>
-      <h2>Click On Todo to see it individually</h2>
-      
-     {todos.length>0 && <h3><b> List of todos: </b></h3>}
-     {/* MAPPING OVER THE TODOS */}
-     {todos.map(t => (
-        <div key={t._id}>
-          <Link href={`/todos/${t._id}`}>
-            <h3 style={{ cursor: "pointer" }}>
-              {t.item} - {t.completed ? "completed" : "incomplete"}
-            </h3>
-          </Link>
-        </div>
-      ))}    
-    <Link href="/todos/create"><button>Add Todo</button></Link>
+    // since there is just one input we will use a uncontrolled form
+    const item = useRef<HTMLInputElement>(null)
 
-    </div>
-  )}
+    const handleSubmit: FormEventHandler<HTMLFormElement> = async event => {
+    event.preventDefault()
 
+    let userName: string = ""
+    if (null !== item.current) {
+        userName = item.current.value
+        console.log('userName = index== ',userName);
+    }
 
-// GET PROPS FOR SERVER SIDE RENDERING
-export async function getServerSideProps() {
-  // get todo data from API
-  const res = await fetch(process.env.API_URL as string)
-  const todos = await res.json()
-  
-  // return props
-  return {
-    props: { todos },
+    // after get the name  push to user todos page
+    router.push({ pathname: "/todos/allUserToDos", query: { userName: userName }})
   }
-}
 
+    return (
+      <div>
+        <h1>Hello </h1>
+        <div>
+            <h2>What is your name ?</h2>
+            <form onSubmit={handleSubmit}>
+                <input type="text" ref={item}></input>
+                <input type="submit" value="Show my todos"></input>
+            </form>
+        </div>
+
+      </div>
+    )}
+  
 export default Index

@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 // Interface to defining our object of response functions
 export interface ResponseFuncs {
     GET?: Function
@@ -7,8 +9,15 @@ export interface ResponseFuncs {
   }
   
   // Interface to define our Todo model on the frontend
-  export interface Todo {
+  export interface TodoType {
     _id?: number
     item: string
     completed: boolean
+  }
+
+//Interface to define our User model
+export interface UserType {
+    _id?: Types.ObjectId
+    userName: string
+    todos: Array<Types.ObjectId> 
   }
