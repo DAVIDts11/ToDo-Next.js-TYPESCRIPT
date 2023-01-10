@@ -1,6 +1,6 @@
 import { useRouter } from "next/router"
 import { FormEvent, FormEventHandler, useRef } from "react"
-import { Todo } from "../../utils/types"
+import { TodoType } from "../../utils/types"
 
 // Define props
 interface CreateProps {
@@ -14,19 +14,23 @@ function Create(props: CreateProps) {
 
   // since there is just one input we will use a uncontrolled form
   const item = useRef<HTMLInputElement>(null)
-
+  
+  let userName: string | null;
+  if (typeof window !== 'undefined') {
+      userName = localStorage.getItem('userName');
+  }
   // Function to create new todo
   const handleSubmit: FormEventHandler<HTMLFormElement> = async event => {
     event.preventDefault()
 
     // construct new todo, create variable, check it item.current is not null to pass type checks
-    let todo: Todo = { item: "", completed: false }
+    let todo: TodoType = { item: "", completed: false }
     if (null !== item.current) {
       todo = { item: item.current.value, completed: false }
     }
 
     // Make the API request
-    await fetch(props.url, {
+    await fetch(props.url+"?userName="+userName, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -35,7 +39,7 @@ function Create(props: CreateProps) {
     })
 
     // after api request, push back to main page
-    router.push("/")
+    router.push({pathname: "/todos/allUserToDos",query: {userName: userName}})
   }
 
   return (
@@ -47,7 +51,7 @@ function Create(props: CreateProps) {
       </form>
       <button
         onClick={() => {
-          router.push("/")
+          router.push({pathname: "/todos/allUserToDos",query: {userName: userName}})
         }}
       >
         Go Back
@@ -57,7 +61,7 @@ function Create(props: CreateProps) {
 }
 
 // export getStaticProps to provie API_URL to component
-export async function getStaticProps(context: any) {
+export async function getStaticProps({query}) {
   return {
     props: {
       url: process.env.API_URL,

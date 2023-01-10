@@ -28,14 +28,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     },
     // RESPONSE FOR DELETE REQUESTS
     DELETE: async (req: NextApiRequest, res: NextApiResponse) => {
-      const { Todo } = await connect() // connect to database
-      res.json(await Todo.findByIdAndRemove(id).catch(catcher))
+      console.log('req query  userName= ',req.query.userName); 
+      const userName : string = req.query.userName as string ; 
+      const { Todo , User} = await connect() // connect to database
+      await Todo.findByIdAndRemove(id).catch(catcher)
+      res.json(await User.updateOne(
+        { userName: userName }, 
+        { $pull: { todos: id } }
+      ))
     },
   }
 
   // Check if there is a response for the particular method, if so invoke it, if not response with an error
   const response = handleCase[method]
-  if (response) response(req, res)
+  if (response) await response(req, res)
   else res.status(400).json({ error: "No Response for This Request" })
 }
 

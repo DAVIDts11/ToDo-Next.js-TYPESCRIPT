@@ -11,14 +11,31 @@ export const connect = async () => {
     .catch(err => console.log(err))
   
 
-  // OUR TODO SCHEMA
+  // TODO SCHEMA
   const TodoSchema = new mongoose.Schema({
     item: String,
     completed: Boolean,
   },{ collection: "todos" })
 
+
+  //USER SCHEMA
+  const userSchema = new mongoose.Schema({
+    userName:{ type: String, required: true },
+    todos: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Todo',
+        },
+      ],
+ },{ collection: "users" });
+
+  const User =  mongoose.models.User || mongoose.model("User", userSchema);
+
   // OUR TODO MODEL
   const Todo = mongoose.models.Todo || mongoose.model("Todo", TodoSchema)
 
-  return { conn, Todo }
+  
+
+
+  return { conn, Todo , User}
 }
